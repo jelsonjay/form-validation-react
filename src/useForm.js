@@ -1,6 +1,6 @@
 import {useState, useEffect} from 'react'
 
-const useForm = () => {
+const useForm = (callback, Validate) => {
 const [values, setValues] = useState({
   username: '',
   email: '',
@@ -9,8 +9,9 @@ const [values, setValues] = useState({
 })
 
 const [errors, setErrors] = useState({})
+const [isSubmitting, setIsSubmitting] = useState(false)
 
-const handleChanges = event =>{
+const handleChange = event =>{
 const {name, value} = event.target
   setValues({
     ...values,
@@ -20,10 +21,17 @@ const {name, value} = event.target
 
 const handleSubmit = event =>{
   event.preventDefault();
-  
+  setErrors(Validate(values))
+  setIsSubmitting(true)
 }
 
-return {handleChanges, values, handleSubmit}
+useEffect(() => {
+ if(Object.keys(errors).length === 0 && isSubmitting){
+   callback()
+ }
+},[errors]);
+
+return {handleChange, values, handleSubmit, errors}
 
 }
 
